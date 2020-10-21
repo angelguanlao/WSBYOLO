@@ -11,6 +11,7 @@ using System.ServiceModel.Configuration;
 using System.IO; //Needed to use streamreader to read CSV
 using ServiceStack; //need in order to interact with AlphaVantage API. Installed through NuGet
 using ServiceStack.Serialization;
+using ServiceStack.Text;
 
 namespace WSBYOLO
 {
@@ -116,8 +117,8 @@ namespace WSBYOLO
         public decimal Open { get; set; } // opening value of stock
         public decimal High { get; set; } // high value of stock
         public decimal Low { get; set; } // low value of stock
-        //public decimal Close { get; set; } //closing value of stock
         public decimal Volume { get; set; } //totoal volume traded in last 24 hours
+        public decimal Close { get; set; } //closing value of stock
 
         private static List<string> NYSEStocks()
         {
@@ -184,7 +185,7 @@ namespace WSBYOLO
                     try //catch error argument out of range error caused in line 193 when CSVReader looks for index out of range
                         //Possible time issue with CSV reader?
                     {
-                        
+
                         var apiKey = "IFN5P986UUWQM8M1"; //Key to access Alpha advantage API distributed by AlphaAdvantage
 
                         //create and object called stock that interacts with AlphaAdvantage API
@@ -194,7 +195,6 @@ namespace WSBYOLO
                         //Stores the data in the StockShow class with the properties specified in the class
                         var stock = $"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symb}&apikey={apiKey}&datatype=csv"
                         .GetStringFromUrl().FromCsv<List<Stocks>>();
-                        
 
 
                         var maxPrice = stock.Max(u => u.High); //get the closing value of returned stock
@@ -204,6 +204,7 @@ namespace WSBYOLO
                         var open = stock.Max(u => u.Open); // get the opening value
                         matching++; //
                         Console.WriteLine($"\nYou should YEET your money towards {symb:c}\nOpening value: {open:c}\nHigh: {maxPrice:c}\nLow:  {minPrice:c}\nTotal Volume: {volume:c}");
+                        
                     }
                     catch(ArgumentOutOfRangeException e) //Error thrown
                     {
@@ -276,7 +277,7 @@ namespace WSBYOLO
             catch (ArgumentOutOfRangeException e) //Error thrown
             {
                 Console.WriteLine("CSV READER THREW AN ERROR PLEASE CLOSE APP AND OPEN AGAIN"); //throw error warning
-                string log = e.ToString(); //move this to logging function of app (future implementation)
+                //string logError = e.ToString(); //move this to logging function of app (future implementation)
             }
         }
 
